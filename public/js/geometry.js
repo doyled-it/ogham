@@ -100,6 +100,9 @@ function stemPrimitives(words, opts, offsetX) {
 }
 
 function computeBounds(primitives) {
+  // Empty input (no words yet) has no geometry: return a zero box so the SVG
+  // renderer produces a valid, empty drawing instead of Infinity dimensions.
+  if (primitives.length === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const pt = (x, y) => { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; };
   for (const p of primitives) {

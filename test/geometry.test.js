@@ -67,3 +67,9 @@ test('horizontal is the vertical geometry rotated 90 clockwise (x,y)->(-y,x)', (
   expect(hs.y1).toBe(vs.x1);
   expect(h.bounds).toEqual({ minX: -30, minY: -30, maxX: 314, maxY: 30 });
 });
+
+test('empty input yields a zero box, not Infinity bounds', () => {
+  const g = layout(tl(''), OPTS);
+  expect(g.primitives).toHaveLength(0);
+  expect(g.bounds).toEqual({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
+});

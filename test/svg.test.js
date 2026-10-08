@@ -37,3 +37,14 @@ test('a white background adds a rect, transparent does not', () => {
   expect(white.svg).toContain('<rect');
   expect(clear.svg).not.toContain('<rect');
 });
+
+test('empty input renders a valid finite-size svg, not Infinity', () => {
+  const empty = layout(
+    transliterate('', { ng: true, hLenition: 'keep', pStrategy: 'pin' }),
+    { orientation: 'vertical', wordSep: 'gap', feather: 'start', strokeWeight: 'regular' },
+  );
+  const { svg, widthMm, heightMm } = renderSVG(empty, { colourway: getColourway('carved'), spacingMm: 5 });
+  expect(Number.isFinite(widthMm)).toBe(true);
+  expect(Number.isFinite(heightMm)).toBe(true);
+  expect(svg).not.toContain('Infinity');
+});
