@@ -1,0 +1,12 @@
+{
+  // Cloudflare Workers static assets for the ogham transliterator.
+  // The public/ folder is served verbatim; there is no Worker script (assets only).
+  //   Dev:    npx wrangler dev
+  //   Deploy: npx wrangler deploy   (or the GitHub-connected Workers build)
+  // The custom domain ogham.doyled-it.com and the GitHub build connection are
+  // configured once in the Cloudflare dashboard; they are not scripted here.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ogham",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public" }
+}
