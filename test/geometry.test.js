@@ -34,3 +34,25 @@ test('a word gap adds 60 units of bare stem between words on one stem', () => {
   const h = (g) => g.bounds.maxY - g.bounds.minY;
   expect(h(far) - h(near)).toBe(38);
 });
+
+test('Pín renders four strokes (a double X) and is one letter wide', () => {
+  const g = layout(tl('p'), { ...OPTS, feather: 'none' });
+  const strokes = g.primitives.filter((p) => p.kind === 'stroke');
+  expect(strokes).toHaveLength(4);
+  for (const s of strokes) {
+    expect(Math.abs(s.x1)).toBeLessThanOrEqual(12);
+    expect(Math.abs(s.x2)).toBeLessThanOrEqual(12);
+  }
+});
+
+test('per-word mode places stems 80 units apart', () => {
+  const g = layout(tl('a a'), { ...OPTS, wordSep: 'per-word', feather: 'none' });
+  const stems = g.primitives.filter((p) => p.kind === 'stem');
+  expect(stems).toHaveLength(2);
+  expect(stems[1].x1 - stems[0].x1).toBe(80);
+});
+
+test('feather both adds a mark at each end', () => {
+  const g = layout(tl('meitheal'), { ...OPTS, feather: 'both' });
+  expect(g.primitives.filter((p) => p.kind === 'feather')).toHaveLength(2);
+});
