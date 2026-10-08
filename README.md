@@ -89,4 +89,7 @@ server-side, and there are no third-party requests, cookies, or analytics.
 
 ## Licence
 
-MIT. See `LICENSE`.
+Source-available, not OSI open source by design. Use is non-commercial only: the
+Commons Clause forbids selling the software or a service whose value is essentially the
+software. And it is copyleft: any derivative, including a modified version run as a network
+service, must be released under the same terms (AGPL-3.0). See `LICENSE`.
