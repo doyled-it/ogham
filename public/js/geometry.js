@@ -131,5 +131,18 @@ export function layout(result, opts) {
   return { primitives, bounds: computeBounds(primitives) };
 }
 
-// Placeholder replaced in Task 8.
-export function rotateCW(primitives) { return primitives; }
+// Rotate every primitive 90 degrees clockwise in SVG screen space: (x,y) -> (-y, x).
+// This is SVG rotate(90). It turns the upright, bottom-to-top stem into a
+// left-to-right one, with the B group below, the H group above, vowels straight
+// across and the M diagonal running lower-left to upper-right.
+export function rotateCW(primitives) {
+  const r = (x, y) => [-y, x];
+  return primitives.map((p) => {
+    if (p.kind === 'feather') {
+      return { ...p, points: p.points.map(([x, y]) => r(x, y)) };
+    }
+    const [x1, y1] = r(p.x1, p.y1);
+    const [x2, y2] = r(p.x2, p.y2);
+    return { ...p, x1, y1, x2, y2 };
+  });
+}

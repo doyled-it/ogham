@@ -56,3 +56,14 @@ test('feather both adds a mark at each end', () => {
   const g = layout(tl('meitheal'), { ...OPTS, feather: 'both' });
   expect(g.primitives.filter((p) => p.kind === 'feather')).toHaveLength(2);
 });
+
+test('horizontal is the vertical geometry rotated 90 clockwise (x,y)->(-y,x)', () => {
+  const v = layout(tl('meitheal'), { ...OPTS });
+  const h = layout(tl('meitheal'), { ...OPTS, orientation: 'horizontal' });
+  expect(h.primitives).toHaveLength(v.primitives.length);
+  const vs = v.primitives.find((p) => p.kind === 'stroke');
+  const hs = h.primitives[v.primitives.indexOf(vs)];
+  expect(hs.x1).toBe(-vs.y1);
+  expect(hs.y1).toBe(vs.x1);
+  expect(h.bounds).toEqual({ minX: -30, minY: -30, maxX: 314, maxY: 30 });
+});
