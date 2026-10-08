@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build / test output
+dist/
+coverage/
+.wrangler/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# brainstorming companion (local only)
+.superpowers/
+
+# OS / editor
+.DS_Store
+*.log
