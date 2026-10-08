@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>ogham transliterator</title>
+  <meta name="description" content="Turn typed text into ogham, drawn as scalable SVG for a tattoo, a laser cutter or a page.">
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#text-input">Skip to the writing box</a>
+
+  <header class="site-header">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 40" aria-hidden="true" focusable="false">
+        <g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="16" y1="3" x2="16" y2="37"/>
+          <line x1="16" y1="9" x2="27" y2="9"/>
+          <line x1="16" y1="13.5" x2="27" y2="13.5"/>
+          <line x1="5" y1="20" x2="16" y2="20"/>
+          <line x1="6.5" y1="31" x2="25.5" y2="27"/>
+        </g>
+      </svg>
+      <div class="brand-text">
+        <h1 class="wordmark">ogham</h1>
+        <p class="tagline">Type a word. Read it in strokes on a stemline, drawn to scale.</p>
+      </div>
+    </div>
+
+    <div class="theme-switch" role="radiogroup" aria-label="Theme">
+      <div class="segmented segmented-sm">
+        <input type="radio" id="theme-auto" name="theme" value="auto" checked>
+        <label for="theme-auto">Auto</label>
+        <input type="radio" id="theme-light" name="theme" value="light">
+        <label for="theme-light">Light</label>
+        <input type="radio" id="theme-dark" name="theme" value="dark">
+        <label for="theme-dark">Dark</label>
+      </div>
+    </div>
+  </header>
+
+  <section class="write-panel">
+    <label class="field-label" for="text-input">Your text</label>
+    <textarea id="text-input" placeholder="meitheal" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="write-help"></textarea>
+    <p id="write-help" class="field-help">Letters only. Spaces separate words, line breaks start a new stem. Fadas and punctuation are set aside.</p>
+    <p id="placeholder-note" class="inline-note" hidden>Showing the example, meitheal. Type above to replace it.</p>
+    <p id="warning" class="inline-note warn" hidden></p>
+    <p id="lenition-note" class="inline-note" hidden></p>
+  </section>
+
+  <main class="workbench">
+    <div class="drawing-col">
+      <figure class="sheet-figure">
+        <div class="sheet">
+          <div id="drawing" data-colourway="carved"></div>
+        </div>
+        <figcaption id="readout" class="readout"></figcaption>
+      </figure>
+    </div>
+
+    <div class="controls-col">
+      <section class="panel" aria-labelledby="h-shape">
+        <h2 class="panel-title" id="h-shape">The drawing</h2>
+
+        <fieldset class="field">
+          <legend>Orientation</legend>
+          <div class="segmented">
+            <input type="radio" id="o-v" name="o" value="v" checked>
+            <label for="o-v">Vertical</label>
+            <input type="radio" id="o-h" name="o" value="h">
+            <label for="o-h">Horizontal</label>
+          </div>
+          <p class="field-hint">Vertical reads bottom to top. Horizontal reads left to right.</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Words</legend>
+          <div class="segmented">
+            <input type="radio" id="w-gap" name="w" value="gap" checked>
+            <label for="w-gap">Gap on one stem</label>
+            <input type="radio" id="w-word" name="w" value="per-word">
+            <label for="w-word">One stem each</label>
+            <input type="radio" id="w-none" name="w" value="none">
+            <label for="w-none">Run together</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Feather mark</legend>
+          <div class="segmented">
+            <input type="radio" id="f-start" name="f" value="start" checked>
+            <label for="f-start">Start</label>
+            <input type="radio" id="f-both" name="f" value="both">
+            <label for="f-both">Both ends</label>
+            <input type="radio" id="f-none" name="f" value="none">
+            <label for="f-none">None</label>
+          </div>
+        </fieldset>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="size">Stroke spacing</label>
+            <div class="measure">
+              <input type="number" id="size" min="1" max="50" step="0.5" value="5" inputmode="decimal">
+              <span class="unit">mm</span>
+            </div>
+          </div>
+          <fieldset class="field">
+            <legend>Weight</legend>
+            <div class="segmented">
+              <input type="radio" id="wt-thin" name="wt" value="thin">
+              <label for="wt-thin">Thin</label>
+              <input type="radio" id="wt-reg" name="wt" value="regular" checked>
+              <label for="wt-reg">Regular</label>
+              <input type="radio" id="wt-heavy" name="wt" value="heavy">
+              <label for="wt-heavy">Heavy</label>
+            </div>
+          </fieldset>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-letters">
+        <h2 class="panel-title" id="h-letters">The letters</h2>
+
+        <div class="toggle-row">
+          <label class="switch" for="ng">
+            <input type="checkbox" id="ng" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label">Treat <span class="ital">ng</span> as one letter (nGéadal)</span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <label class="switch" for="h-keep">
+            <input type="checkbox" id="h-keep" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label">Keep <span class="ital">h</span> after a consonant</span>
+          </label>
+        </div>
+
+        <fieldset class="field">
+          <legend>Write p as</legend>
+          <div class="segmented">
+            <input type="radio" id="p-pin" name="p" value="pin" checked>
+            <label for="p-pin">Pín</label>
+            <input type="radio" id="p-ceirt" name="p" value="ceirt">
+            <label for="p-ceirt">Ceirt (q)</label>
+            <input type="radio" id="p-peith" name="p" value="peith">
+            <label for="p-peith">Peith</label>
+          </div>
+          <p class="field-hint">Pín is the double-X the stones added for p. Q is the older substitution, Peith the later manuscript letter.</p>
+        </fieldset>
+      </section>
+
+      <section class="panel" aria-labelledby="h-ink">
+        <h2 class="panel-title" id="h-ink">Ink</h2>
+        <div id="colourways" class="swatches" role="radiogroup" aria-label="Colourway"></div>
+        <p id="provenance" class="provenance"></p>
+        <fieldset class="field">
+          <legend>Background</legend>
+          <div class="segmented">
+            <input type="radio" id="bg-transparent" name="bg" value="transparent" checked>
+            <label for="bg-transparent">None</label>
+            <input type="radio" id="bg-white" name="bg" value="white">
+            <label for="bg-white">White</label>
+            <input type="radio" id="bg-canvas" name="bg" value="canvas">
+            <label for="bg-canvas">Ink's own</label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="panel" aria-labelledby="h-take">
+        <h2 class="panel-title" id="h-take">Take it with you</h2>
+        <div class="export-actions">
+          <button type="button" id="dl-svg" class="btn btn-primary">Download SVG</button>
+          <button type="button" id="dl-png" class="btn">Download PNG</button>
+          <button type="button" id="copy-svg" class="btn">Copy SVG</button>
+          <button type="button" id="copy-link" class="btn">Copy share link</button>
+        </div>
+        <div class="field dpi-field">
+          <label class="field-label" for="dpi">PNG detail</label>
+          <div class="segmented">
+            <input type="radio" id="dpi-150" name="dpi" value="150">
+            <label for="dpi-150">150 dpi</label>
+            <input type="radio" id="dpi-300" name="dpi" value="300" checked>
+            <label for="dpi-300">300 dpi</label>
+            <input type="radio" id="dpi-600" name="dpi" value="600">
+            <label for="dpi-600">600 dpi</label>
+          </div>
+        </div>
+        <p id="export-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <section class="breakdown-section">
+    <h2 class="section-title">Letter by letter</h2>
+    <p class="section-intro">Each stroke group in reading order, so you can check the drawing against any chart. A dot marks a letter mapped by convention.</p>
+    <div id="breakdown" class="breakdown"></div>
+  </section>
+
+  <section class="about" aria-labelledby="h-about">
+    <h2 class="section-title" id="h-about">About ogham</h2>
+    <div class="about-grid">
+      <div class="about-col">
+        <p>Ogham is an alphabet of strokes cut across a stemline, on the edges of standing stones in Ireland and western Britain from roughly the fourth to the sixth century, for an early form of Irish. There are twenty letters in four groups of five, called aicmí. A stone is read from the bottom up.</p>
+        <p>This tool is a transliterator, not a translator. It maps the letters of a modern spelling, one for one, to ogham letters. That is a modern convenience rather than how the stones ever spelled anything, but it lets a word survive a round trip back to Latin letters.</p>
+        <h3>The choices made here</h3>
+        <p>Fadas are dropped, because ogham did not write vowel length. The letter h after a consonant (bh, ch, dh, fh, gh, mh, ph, sh, th) marks lenition in modern Irish, which ogham never wrote, so the stones give no guidance. This tool keeps that h as the letter Úath by default, and offers a historical "drop" for a cleaner look.</p>
+        <p>Sounds Irish lacks are mapped by convention and flagged: k becomes Coll, v and w become Fearn, j and y become Iodhadh, x becomes Coll plus Sail. The letter p is written with Pín, the double-X sign the stones themselves added for it (Cool East, Crickhowell and Margam; Cool East cuts it as a single X because the double form is hard to carve). The older Q substitution and the later manuscript letter Peith are offered as alternatives. P is never silently turned into b.</p>
+      </div>
+      <div class="about-col">
+        <h3>The feather mark</h3>
+        <p>A chevron at the foot of the stem, pointing toward the letters, marks where the writing begins. There is no closing mark by default: the OG(H)AM project advises against one for modern use, so it is offered only as an option.</p>
+        <h3>Why it is drawn, not typed</h3>
+        <p>Ogham has a Unicode block, but every font draws it differently, most render only horizontally, and none let you set the stroke length, spacing or physical size. Here every letter is drawn as SVG from its geometry, so the output is exact, scalable, and ready for a tattoo artist, a laser cutter or a page.</p>
+        <h3>The ink</h3>
+        <p>The colourways are grounded in real Irish material: the pigments of the Book of Kells, the dyes of early Irish cloth, the enamel of La Tène metalwork. Carved black is the default, because black on white is what a stencil or a laser cutter needs.</p>
+        <h3>Sources</h3>
+        <ul class="sources">
+          <li><a href="https://en.wikipedia.org/wiki/Ogham" rel="noopener">Ogham, Wikipedia</a></li>
+          <li><a href="https://ogham.glasgow.ac.uk/index.php/2024/08/23/feather-marks/" rel="noopener">OG(H)AM project: Feather-marks</a></li>
+          <li><a href="https://ogham.glasgow.ac.uk/index.php/2024/04/24/the-future-of-digital-ogam-potential-updates-to-the-unicode-ogham-block-to-facilitate-modern-usage/" rel="noopener">OG(H)AM project: The Future of Digital Ogam</a></li>
+          <li><a href="https://ogham.celt.dias.ie/" rel="noopener">Ogham in 3D, Dublin Institute for Advanced Studies</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Forfeda" rel="noopener">Forfeda, Wikipedia</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Primitive_Irish" rel="noopener">Primitive Irish, Wikipedia</a></li>
+          <li><a href="https://www.unicode.org/charts/PDF/U1680.pdf" rel="noopener">Unicode Ogham chart (U+1680)</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>Drawn as SVG from the geometry, no fonts. MIT licensed. Nothing leaves your browser.</p>
+  </footer>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
