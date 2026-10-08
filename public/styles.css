@@ -51,6 +51,10 @@
   --sheet-frame: #0c1812;
 }
 
+/* Keep native control chrome (spinners, focus) in step with a forced theme. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }

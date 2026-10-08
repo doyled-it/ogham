@@ -139,9 +139,12 @@ function renderBreakdown(glyphs) {
 
     const glyphBox = document.createElement('div');
     glyphBox.className = 'tile-glyph';
+    // Decorative: the adjacent value and name already name this letter, so hide
+    // the drawn glyph from assistive tech to avoid reading the name twice.
+    glyphBox.setAttribute('aria-hidden', 'true');
     const mini = layout({ stems: [{ words: [[g]] }], ignored: [], notes: [] },
       { orientation: 'vertical', wordSep: 'none', feather: 'none', strokeWeight: 'regular' });
-    glyphBox.innerHTML = renderSVG(mini, { colourway: { ink: 'currentColor', canvas: null }, spacingMm: 5, ariaLabel: g.name }).svg;
+    glyphBox.innerHTML = renderSVG(mini, { colourway: { ink: 'currentColor', canvas: null }, spacingMm: 5 }).svg;
 
     const value = document.createElement('div');
     value.className = 'tile-value';
@@ -231,7 +234,11 @@ function downloadSvg() {
 async function downloadPng() {
   if (!lastRender) { status('Add some letters first.'); return; }
   const dpi = dpiValue();
-  const pngBg = lastRender.bg === 'transparent' ? 'white' : 'transparent';
+  // Never hand back a transparent PNG (a stencil needs a solid background). This
+  // also covers a crafted share link like ?c=carved&bg=canvas, where the canvas
+  // colourway has no fill, so the SVG carries no background rect.
+  const noFill = lastRender.bg === 'transparent' || (lastRender.bg === 'canvas' && !lastRender.canvas);
+  const pngBg = noFill ? 'white' : 'transparent';
   try {
     const blob = await svgToPng(lastRender.svg, lastRender.widthMm, lastRender.heightMm, dpi, pngBg);
     const name = buildFilename(lastRender.text, lastRender.heightMm / 10, dpi, 'png');
