@@ -163,3 +163,28 @@ test('a glyph part marked poly becomes a poly primitive carried through layout',
   expect(g.primitives.filter((p) => p.kind === 'stroke')).toHaveLength(1);
   expect(g.primitives.filter((p) => p.kind === 'poly')).toHaveLength(0);
 });
+
+test('curved variants produce poly parts with endpoints on the stem', () => {
+  const semi = { value: 'ui', name: 'Semicircular Uilleann', group: 'semi-uilleann', strokes: null, flags: ['proposed'] };
+  const g = layout({ stems: [{ words: [[semi]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  const polys = g.primitives.filter((p) => p.kind === 'poly');
+  expect(polys).toHaveLength(1);
+  const pts = polys[0].points;
+  // a right semicircle of radius 14 centred on the stem: ends on the stem, bulge to +x = 14
+  expect(Math.round(Math.max(...pts.map((p) => p[0])))).toBe(14);
+  expect(Math.round(Math.min(...pts.map((p) => p[0])))).toBe(0);
+});
+
+test('rabbit-eared Dair is two poly parts on one side of the stem', () => {
+  const d = { value: 'd', name: 'Rabbit-eared Dair', group: 'rabbit-d', strokes: null, flags: ['proposed'] };
+  const g = layout({ stems: [{ words: [[d]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  const polys = g.primitives.filter((p) => p.kind === 'poly');
+  expect(polys).toHaveLength(2);
+  for (const p of polys) for (const [x] of p.points) expect(x).toBeLessThanOrEqual(0);
+});
+
+test('S-shaped Ailm is one poly crossing the stem', () => {
+  const a = { value: 'a', name: 'S-shaped Ailm', group: 's-ailm', strokes: null, flags: ['proposed'] };
+  const g = layout({ stems: [{ words: [[a]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  expect(g.primitives.filter((p) => p.kind === 'poly')).toHaveLength(1);
+});

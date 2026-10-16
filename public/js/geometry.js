@@ -92,11 +92,63 @@ const FORFID_STROKES = {
 };
 const FORFID_SPAN = { eabhadh: 0, or: 0, uilleann: 20, eamhancholl: 0 };
 
+// Point samplers for the three curved variant forms. They return [x, y] points
+// in the vertical convention; the stem builder wraps each list as a poly part.
+function sampleQuad(p0, c, p1, n) {
+  const pts = [];
+  for (let k = 0; k <= n; k += 1) {
+    const t = k / n, u = 1 - t;
+    pts.push([
+      u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0],
+      u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1],
+    ]);
+  }
+  return pts;
+}
+function sampleCubic(p0, c1, c2, p1, n) {
+  const pts = [];
+  for (let k = 0; k <= n; k += 1) {
+    const t = k / n, u = 1 - t;
+    pts.push([
+      u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0],
+      u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1],
+    ]);
+  }
+  return pts;
+}
+function sampleArc(cx, cy, r, a0, a1, n) {
+  const pts = [];
+  for (let k = 0; k <= n; k += 1) {
+    const a = a0 + (a1 - a0) * (k / n);
+    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  return pts;
+}
+
+// Rabbit-eared Dair: two strokes on one side of the stem, tips curving apart.
+function rabbitDairStrokes(y) {
+  return [
+    ['poly', sampleQuad([0, y + 2], [-14, y + 6], [-24, y + 14], 6)],
+    ['poly', sampleQuad([0, y - 2], [-14, y - 6], [-24, y - 14], 6)],
+  ];
+}
+// S-shaped Ailm: a sigmoid crossing the stem.
+function sAilmStrokes(y) {
+  return [['poly', sampleCubic([0, y - 12], [12, y - 6], [-12, y + 6], [0, y + 12], 10)]];
+}
+// Semicircular Uilleann: a right semicircle, diameter on the stem, bulge off it.
+function semiUilleannStrokes(y) {
+  return [['poly', sampleArc(0, y, 14, -Math.PI / 2, Math.PI / 2, 10)]];
+}
+
 // Vertical extent a glyph occupies above its first stroke (first stroke to last).
 function glyphSpan(glyph) {
   if (glyph.group === 'p') return 20;      // Pín / Ifín: two X centres 20 apart
   if (glyph.group === 'peith') return 14;  // two strokes 14 tall
   if (glyph.group in FORFID_SPAN) return FORFID_SPAN[glyph.group];
+  if (glyph.group === 'rabbit-d') return 14;
+  if (glyph.group === 's-ailm') return 0;
+  if (glyph.group === 'semi-uilleann') return 0;
   return (glyph.strokes - 1) * PITCH;
 }
 
@@ -104,6 +156,9 @@ function glyphStrokes(glyph, y, tradition) {
   if (glyph.group === 'p') return pinStrokes(y);
   if (glyph.group === 'peith') return peithStrokes(y);
   if (FORFID_STROKES[glyph.group]) return FORFID_STROKES[glyph.group](y);
+  if (glyph.group === 'rabbit-d') return rabbitDairStrokes(y);
+  if (glyph.group === 's-ailm') return sAilmStrokes(y);
+  if (glyph.group === 'semi-uilleann') return semiUilleannStrokes(y);
   return letterStrokes(glyph.group, glyph.strokes, y, PITCH, tradition);
 }
 
