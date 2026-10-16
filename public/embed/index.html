@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embed ogham</title>
+  <link rel="stylesheet" href="./embed.css">
+  <script src="./ogham.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Embed ogham</h1>
+    <p class="sub">Put scalable, drawn ogham on your own page with one script tag. No build, no font.</p>
+
+    <h2>Add it</h2>
+    <pre><code>&lt;script src="https://ogham.doyled-it.com/embed/ogham.js"&gt;&lt;/script&gt;
+
+&lt;ogham-text text="meitheal"&gt;&lt;/ogham-text&gt;</code></pre>
+    <p>That registers the <code>&lt;ogham-text&gt;</code> element and a <code>window.Ogham.oghamSVG(text, options)</code> function. The drawing scales to its container; add the <code>physical</code> attribute to keep millimetre sizing for print or a laser cutter.</p>
+
+    <h2>Attributes</h2>
+    <table>
+      <tr><th>Attribute</th><th>Values</th></tr>
+      <tr><td>text</td><td>the text to draw</td></tr>
+      <tr><td>mode</td><td>latin (default) or unicode (draw pasted ogham code points)</td></tr>
+      <tr><td>orientation</td><td>vertical (default) or horizontal</td></tr>
+      <tr><td>tradition</td><td>manuscript (default) or monumental</td></tr>
+      <tr><td>colourway</td><td>carved, bronze, orpiment, redlead, woad, verdigris, crotal, irongall</td></tr>
+      <tr><td>words</td><td>gap (default), per-word, none</td></tr>
+      <tr><td>feather</td><td>start (default), both, none</td></tr>
+      <tr><td>weight</td><td>thin, regular (default), heavy</td></tr>
+      <tr><td>spacing</td><td>stroke spacing in mm (default 5)</td></tr>
+      <tr><td>background</td><td>transparent (default), white, canvas</td></tr>
+      <tr><td>physical</td><td>present to keep millimetre sizing instead of scaling to the container</td></tr>
+    </table>
+
+    <h2>Examples</h2>
+    <div class="examples">
+      <figure class="example"><ogham-text text="meitheal" orientation="horizontal"></ogham-text><figcaption>meitheal, horizontal</figcaption></figure>
+      <figure class="example"><ogham-text text="Sláinte" orientation="horizontal" colourway="bronze"></ogham-text><figcaption>bronze ink</figcaption></figure>
+      <figure class="example"><ogham-text text="ogham" orientation="horizontal" tradition="monumental"></ogham-text><figcaption>monumental vowels</figcaption></figure>
+    </div>
+
+    <h2>From code</h2>
+    <pre><code>const { svg } = Ogham.oghamSVG('meitheal', { orientation: 'horizontal', colourway: 'woad' });
+document.querySelector('#here').innerHTML = svg;</code></pre>
+
+    <p><a href="../">Back to the ogham tool</a></p>
+  </main>
+</body>
+</html>

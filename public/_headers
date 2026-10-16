@@ -2,3 +2,6 @@
   Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; style-src 'self'
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
+
+/embed/*
+  Access-Control-Allow-Origin: *
