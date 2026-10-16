@@ -99,6 +99,17 @@
           </div>
         </fieldset>
 
+        <fieldset class="field">
+          <legend>Tradition</legend>
+          <div class="segmented">
+            <input type="radio" id="tr-manuscript" name="tr" value="manuscript" checked>
+            <label for="tr-manuscript">Manuscript</label>
+            <input type="radio" id="tr-monumental" name="tr" value="monumental">
+            <label for="tr-monumental">Monumental</label>
+          </div>
+          <p class="field-hint">Manuscript draws vowels as full strokes. Monumental cuts them as notches, the orthodox stone form.</p>
+        </fieldset>
+
         <div class="field-row">
           <div class="field">
             <label class="field-label" for="size">Stroke spacing</label>
@@ -201,6 +212,12 @@
     <div id="breakdown" class="breakdown"></div>
   </section>
 
+  <section class="forfeda-section" aria-labelledby="h-forfeda">
+    <h2 class="section-title" id="h-forfeda">The forfeda</h2>
+    <p class="section-intro">The supplementary letters. The tool writes p with P&iacute;n, the double X, which is the letter If&iacute;n. The rest are drawn here from the same geometry, for reference. A gold dot marks a shape that is the standard digital form but is not yet confirmed against a manuscript.</p>
+    <div id="forfeda" class="breakdown"></div>
+  </section>
+
   <section class="about" aria-labelledby="h-about">
     <h2 class="section-title" id="h-about">About ogham</h2>
     <div class="about-grid">
@@ -214,6 +231,8 @@
       <div class="about-col">
         <h3>The feather mark</h3>
         <p>A chevron at the foot of the stem, pointing toward the letters, marks where the writing begins. There is no closing mark by default: the OG(H)AM project advises against one for modern use, so it is offered only as an option.</p>
+        <h3>Two traditions</h3>
+        <p>On stone, vowels were cut as short notches across the edge. In the later manuscripts they are drawn as full strokes on a stemline, which is the default here. The Monumental setting switches the vowels back to notches. It changes the vowels only and does not pretend to be a stone.</p>
         <h3>Why it is drawn, not typed</h3>
         <p>Ogham has a Unicode block, but every font draws it differently, most render only horizontally, and none let you set the stroke length, spacing or physical size. Here every letter is drawn as SVG from its geometry, so the output is exact, scalable, and ready for a tattoo artist, a laser cutter or a page.</p>
         <h3>The ink</h3>

@@ -279,6 +279,17 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.15; }
 }
 .breakdown-empty { color: var(--muted); font-style: italic; }
 
+/* Forfeda reference (reuses the breakdown grid and tiles) */
+.forfeda-section { margin-top: 40px; }
+.tile-cp {
+  font-size: .68rem; color: var(--muted); margin-top: 3px;
+  letter-spacing: .02em; font-variant-numeric: tabular-nums;
+}
+.tile.unconfirmed::after {
+  content: ""; position: absolute; top: .55rem; right: .55rem;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+}
+
 /* About */
 .about { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
 .about-grid { display: grid; gap: 28px; }
