@@ -94,6 +94,15 @@ test('Peith is two short strokes, not the old Beith-and-hook', () => {
   for (const s of strokes) expect(Math.abs(s.x2)).toBeLessThan(30);
 });
 
+test('diagonal Iodhadh (group m, 5 strokes) draws the same strokes as Ruis', () => {
+  const sOf = (glyph) => layout({ stems: [{ words: [[glyph]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' })
+    .primitives.filter((p) => p.kind === 'stroke').map((p) => [p.x1, p.y1, p.x2, p.y2]);
+  const diagonal = sOf({ value: 'i', name: 'Diagonal Iodhadh', group: 'm', strokes: 5, flags: ['proposed'] });
+  const ruis = sOf({ value: 'r', name: 'Ruis', group: 'm', strokes: 5, flags: [] });
+  expect(diagonal).toHaveLength(5);
+  expect(diagonal).toEqual(ruis); // same shape; distinguished only by name and flag
+});
+
 test('manuscript vowels are full bars, monumental vowels are short notches', () => {
   expect(letterStrokes('v', 1, 0)).toEqual([[-12, 0, 12, 0]]);
   expect(letterStrokes('v', 1, 0, 10, 'manuscript')).toEqual([[-12, 0, 12, 0]]);

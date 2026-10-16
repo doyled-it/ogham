@@ -70,3 +70,12 @@ test('unknown characters are reported', () => {
   const r = parseOgham('ᚁx', {});
   expect(r.ignored.some((i) => i.char === 'x')).toBe(true);
 });
+
+test('diagonal Iodhadh reuses Ruis geometry but keeps a distinct name and flag', () => {
+  const r = parseOgham(String.fromCodePoint(0x1694, 0xfe02), {}); // Iodhadh + VS3
+  const g = r.stems[0].words[0][0];
+  expect(g.name).toBe('Diagonal Iodhadh');
+  expect(g.group).toBe('m'); // the same geometry key as Ruis
+  expect(g.strokes).toBe(5);
+  expect(g.flags).toContain('proposed');
+});
