@@ -32,3 +32,26 @@ test('the forfeda reference shows all six letters', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#forfeda .tile')).toHaveCount(6);
 });
+
+test('switching to ogham mode shows the palette and hides the latin-only controls', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#palette')).toBeHidden();
+  await page.click('label[for="src-unicode"]');
+  await expect(page.locator('#palette')).toBeVisible();
+  await expect(page.locator('.latin-only').first()).toBeHidden();
+});
+
+test('inserting a letter from the palette draws it', async ({ page }) => {
+  await page.goto('/');
+  await page.click('label[for="src-unicode"]');
+  await page.getByRole('button', { name: 'Beith b' }).click();
+  await expect(page.locator('#drawing svg')).toBeVisible();
+  await expect(page.locator('#breakdown .tile')).toHaveCount(1);
+});
+
+test('a proposed variant is tagged in the breakdown', async ({ page }) => {
+  await page.goto('/');
+  await page.click('label[for="src-unicode"]');
+  await page.getByRole('button', { name: 'Angled Ailm' }).click();
+  await expect(page.locator('#breakdown .tile.is-proposed')).toHaveCount(1);
+});
