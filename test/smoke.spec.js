@@ -16,3 +16,19 @@ test('the drawing matches a stored reference', async ({ page }) => {
   await page.fill('#text-input', 'meitheal');
   await expect(page.locator('#drawing')).toHaveScreenshot('meitheal.png', { maxDiffPixelRatio: 0.03 });
 });
+
+test('switching to the monumental tradition shrinks the vowels to notches', async ({ page }) => {
+  await page.goto('/');
+  await page.fill('#text-input', 'meitheal');
+  // four vowels in meitheal: e(4) i(5) e(4) a(1) = 14 vowel strokes, drawn as
+  // full bars (x1 = -12) in the manuscript default.
+  await expect(page.locator('#drawing svg line[x1="-12"]')).toHaveCount(14);
+  await page.check('#tr-monumental');
+  await expect(page.locator('#drawing svg line[x1="-12"]')).toHaveCount(0);
+  await expect(page.locator('#drawing svg line[x1="-4"]')).toHaveCount(14);
+});
+
+test('the forfeda reference shows all six letters', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#forfeda .tile')).toHaveCount(6);
+});
