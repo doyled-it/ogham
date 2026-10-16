@@ -113,6 +113,25 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.15; }
 .field-help { margin: 8px 2px 0; color: var(--muted); font-size: .85rem; }
 .inline-note { margin: 8px 2px 0; font-size: .88rem; color: var(--muted); }
 .inline-note.warn { color: var(--oxblood); }
+.source-switch { margin-bottom: 12px; max-width: 280px; }
+.palette { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+.palette-intro { margin: 0; color: var(--muted); font-size: .85rem; }
+.palette-group { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; background: var(--surface); }
+.palette-group h3 { margin: 0 0 8px; font-size: .9rem; color: var(--gold); }
+.palette-group .note { font-size: .78rem; color: var(--muted); font-style: italic; margin: 0 0 8px; }
+.palette-keys { display: flex; flex-wrap: wrap; gap: 6px; }
+.palette-key {
+  font: inherit; font-size: .82rem; cursor: pointer;
+  padding: .4rem .6rem; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface-2); color: var(--ink);
+}
+.palette-key:hover { border-color: var(--gold); }
+.palette-key:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.tile.is-proposed::after {
+  content: ""; position: absolute; top: .55rem; left: .55rem;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+}
+body.mode-unicode .latin-only { display: none; }
 
 /* Workbench layout */
 .workbench { display: grid; gap: 22px; margin-top: 22px; align-items: start; }

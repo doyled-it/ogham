@@ -1,4 +1,6 @@
 import { transliterate } from './transliterate.js';
+import { parseOgham } from './unicode.js';
+import { PALETTE } from './palette.js';
 import { layout } from './geometry.js';
 import { FORFEDA } from './alphabet.js';
 import { renderSVG } from './svg.js';
@@ -21,6 +23,7 @@ const els = {
   ng: document.getElementById('ng'),
   hKeep: document.getElementById('h-keep'),
   status: document.getElementById('export-status'),
+  palette: document.getElementById('palette'),
 };
 
 let lastRender = null;
@@ -63,6 +66,7 @@ function readSettings() {
     wt: radioVal('wt', DEFAULTS.wt),
     tr: radioVal('tr', DEFAULTS.tr),
     bg: radioVal('bg', DEFAULTS.bg),
+    src: radioVal('src', DEFAULTS.src),
   };
 }
 function applySettings(s) {
@@ -76,6 +80,7 @@ function applySettings(s) {
   setRadio('wt', s.wt);
   setRadio('tr', s.tr);
   setRadio('bg', s.bg);
+  setRadio('src', s.src);
   els.size.value = s.s;
   setRadio('c', s.c);
 }
@@ -139,7 +144,10 @@ function renderBreakdown(glyphs) {
   const frag = document.createDocumentFragment();
   for (const g of glyphs) {
     const tile = document.createElement('div');
-    tile.className = g.flags.includes('convention') ? 'tile has-convention' : 'tile';
+    tile.className = 'tile';
+    if (g.flags.includes('convention')) tile.classList.add('has-convention');
+    if (g.flags.includes('proposed')) tile.classList.add('is-proposed');
+    if (g.flags.includes('proposed')) tile.title = 'Proposed variant, not encoded in Unicode';
 
     const glyphBox = document.createElement('div');
     glyphBox.className = 'tile-glyph';
@@ -199,14 +207,64 @@ function renderForfeda() {
   els.forfeda.replaceChildren(frag);
 }
 
+/* Ogham input mode */
+function buildPalette() {
+  const frag = document.createDocumentFragment();
+  for (const group of PALETTE) {
+    const box = document.createElement('div');
+    box.className = 'palette-group';
+    const h = document.createElement('h3');
+    h.textContent = group.title;
+    box.append(h);
+    if (group.note) {
+      const n = document.createElement('p');
+      n.className = 'note';
+      n.textContent = group.note;
+      box.append(n);
+    }
+    const keys = document.createElement('div');
+    keys.className = 'palette-keys';
+    for (const item of group.items) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'palette-key';
+      b.textContent = item.label;
+      b.addEventListener('click', () => insertAtCaret(item.insert));
+      keys.append(b);
+    }
+    box.append(keys);
+    frag.append(box);
+  }
+  els.palette.append(frag);
+}
+
+function insertAtCaret(str) {
+  const el = els.text;
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? el.value.length;
+  el.value = el.value.slice(0, start) + str + el.value.slice(end);
+  const pos = start + str.length;
+  el.setSelectionRange(pos, pos);
+  el.focus();
+  render();
+}
+
+function applyMode(src) {
+  document.body.classList.toggle('mode-unicode', src === 'unicode');
+  els.palette.hidden = src !== 'unicode';
+  els.text.setAttribute('placeholder', src === 'unicode' ? 'ᚆᚕᚒᚉ' : 'meitheal');
+}
+
 /* Main render */
 function render() {
   const raw = els.text.value;
-  const usingPlaceholder = raw.trim() === '';
-  const text = usingPlaceholder ? 'meitheal' : raw;
   const s = readSettings();
+  const usingPlaceholder = raw.trim() === '' && s.src === 'latin';
+  const text = usingPlaceholder ? 'meitheal' : raw;
 
-  const result = transliterate(text, { ng: s.ng, hLenition: s.h, pStrategy: s.p });
+  const result = s.src === 'unicode'
+    ? parseOgham(text)
+    : transliterate(text, { ng: s.ng, hLenition: s.h, pStrategy: s.p });
   const glyphs = flattenGlyphs(result);
 
   showPlaceholderNote(usingPlaceholder);
@@ -308,9 +366,10 @@ function wire() {
   els.text.addEventListener('input', debounced);
   els.size.addEventListener('input', render);
 
-  for (const name of ['o', 'w', 'f', 'p', 'wt', 'bg', 'tr']) {
+  for (const name of ['o', 'w', 'f', 'p', 'wt', 'bg', 'tr', 'src']) {
     document.querySelectorAll(`input[name="${name}"]`).forEach((el) => el.addEventListener('change', render));
   }
+  document.querySelectorAll('input[name="src"]').forEach((el) => el.addEventListener('change', () => applyMode(radioVal('src', DEFAULTS.src))));
   els.ng.addEventListener('change', render);
   els.hKeep.addEventListener('change', render);
   els.colourways.addEventListener('change', onColourwayChange);
@@ -329,6 +388,8 @@ function init() {
   applySettings(settings);
   initTheme();
   updateProvenance();
+  buildPalette();
+  applyMode(settings.src);
   wire();
   renderForfeda();
   render();

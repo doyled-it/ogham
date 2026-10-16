@@ -42,12 +42,23 @@
   </header>
 
   <section class="write-panel">
+    <div class="source-switch" role="radiogroup" aria-label="Input">
+      <div class="segmented segmented-sm">
+        <input type="radio" id="src-latin" name="src" value="latin" checked>
+        <label for="src-latin">Latin text</label>
+        <input type="radio" id="src-unicode" name="src" value="unicode">
+        <label for="src-unicode">Ogham</label>
+      </div>
+    </div>
     <label class="field-label" for="text-input">Your text</label>
     <textarea id="text-input" placeholder="meitheal" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="write-help"></textarea>
     <p id="write-help" class="field-help">Letters only. Spaces separate words, line breaks start a new stem. Fadas and punctuation are set aside.</p>
     <p id="placeholder-note" class="inline-note" hidden>Showing the example, meitheal. Type above to replace it.</p>
     <p id="warning" class="inline-note warn" hidden></p>
     <p id="lenition-note" class="inline-note" hidden></p>
+    <div id="palette" class="palette" hidden>
+      <p class="palette-intro">Click to insert. Pasting ogham works too. The <strong>proposed variants</strong> are a 2016 proposal that was never encoded in Unicode.</p>
+    </div>
   </section>
 
   <main class="workbench">
@@ -135,7 +146,7 @@
       <section class="panel" aria-labelledby="h-letters">
         <h2 class="panel-title" id="h-letters">The letters</h2>
 
-        <div class="toggle-row">
+        <div class="toggle-row latin-only">
           <label class="switch" for="ng">
             <input type="checkbox" id="ng" checked>
             <span class="switch-track" aria-hidden="true"></span>
@@ -143,7 +154,7 @@
           </label>
         </div>
 
-        <div class="toggle-row">
+        <div class="toggle-row latin-only">
           <label class="switch" for="h-keep">
             <input type="checkbox" id="h-keep" checked>
             <span class="switch-track" aria-hidden="true"></span>
@@ -151,7 +162,7 @@
           </label>
         </div>
 
-        <fieldset class="field">
+        <fieldset class="field latin-only">
           <legend>Write p as</legend>
           <div class="segmented">
             <input type="radio" id="p-pin" name="p" value="pin" checked>
