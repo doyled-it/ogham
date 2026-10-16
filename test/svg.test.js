@@ -48,3 +48,12 @@ test('empty input renders a valid finite-size svg, not Infinity', () => {
   expect(Number.isFinite(heightMm)).toBe(true);
   expect(svg).not.toContain('Infinity');
 });
+
+test('a poly primitive renders as a polyline', () => {
+  const geom = {
+    bounds: { minX: 0, minY: 0, maxX: 20, maxY: 20 },
+    primitives: [{ kind: 'poly', points: [[0, 0], [10, 10], [20, 0]], width: 4 }],
+  };
+  const { svg } = renderSVG(geom, { colourway: getColourway('carved'), spacingMm: 5 });
+  expect(svg).toContain('<polyline points="0,0 10,10 20,0"');
+});

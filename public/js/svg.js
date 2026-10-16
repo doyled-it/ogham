@@ -31,7 +31,7 @@ export function renderSVG(geom, opts) {
   if (bg) body.push(`<rect x="${minX}" y="${minY}" width="${wUnits}" height="${hUnits}" fill="${bg}"/>`);
   body.push(`<g fill="none" stroke="${ink}" stroke-linecap="round" stroke-linejoin="round">`);
   for (const p of primitives) {
-    if (p.kind === 'feather') {
+    if (p.kind === 'feather' || p.kind === 'poly') {
       const pts = p.points.map(([x, y]) => `${round(x)},${round(y)}`).join(' ');
       body.push(`<polyline points="${pts}" stroke-width="${p.width}"/>`);
     } else {

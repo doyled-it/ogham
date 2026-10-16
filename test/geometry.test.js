@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { transliterate } from '../public/js/transliterate.js';
-import { layout, letterStrokes } from '../public/js/geometry.js';
+import { layout, letterStrokes, rotateCW } from '../public/js/geometry.js';
 
 const OPTS = { orientation: 'vertical', wordSep: 'gap', feather: 'start', strokeWeight: 'regular' };
 const tl = (s, o = {}) => transliterate(s, { ng: true, hLenition: 'keep', pStrategy: 'pin', ...o });
@@ -148,4 +148,9 @@ test('empty input yields a zero box, not Infinity bounds', () => {
   const g = layout(tl(''), OPTS);
   expect(g.primitives).toHaveLength(0);
   expect(g.bounds).toEqual({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
+});
+
+test('rotateCW rotates a poly primitive point by point', () => {
+  const [p] = rotateCW([{ kind: 'poly', points: [[2, 3], [4, 5]], width: 4 }]);
+  expect(p.points).toEqual([[-3, 2], [-5, 4]]);
 });

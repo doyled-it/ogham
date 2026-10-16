@@ -160,7 +160,7 @@ function computeBounds(primitives) {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const pt = (x, y) => { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; };
   for (const p of primitives) {
-    if (p.kind === 'feather') for (const [x, y] of p.points) pt(x, y);
+    if (p.kind === 'feather' || p.kind === 'poly') for (const [x, y] of p.points) pt(x, y);
     else { pt(p.x1, p.y1); pt(p.x2, p.y2); }
   }
   return { minX, minY, maxX, maxY };
@@ -195,7 +195,7 @@ export function layout(result, opts) {
 export function rotateCW(primitives) {
   const r = (x, y) => [-y, x];
   return primitives.map((p) => {
-    if (p.kind === 'feather') {
+    if (p.kind === 'feather' || p.kind === 'poly') {
       return { ...p, points: p.points.map(([x, y]) => r(x, y)) };
     }
     const [x1, y1] = r(p.x1, p.y1);
