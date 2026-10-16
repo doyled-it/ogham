@@ -6,8 +6,17 @@ test('decode of empty query gives the defaults', () => {
 });
 
 test('encode then decode round-trips a settings object', () => {
-  const s = { t: 'meitheal', o: 'h', w: 'per-word', f: 'both', ng: false, h: 'drop', p: 'ceirt', c: 'bronze', s: 8, wt: 'heavy', bg: 'white' };
+  const s = { t: 'meitheal', o: 'h', w: 'per-word', f: 'both', ng: false, h: 'drop', p: 'ceirt', c: 'bronze', s: 8, wt: 'heavy', bg: 'white', tr: 'monumental' };
   expect(decode(encode(s))).toEqual(s);
+});
+
+test('tradition defaults to manuscript and old links without tr still decode', () => {
+  expect(decode('').tr).toBe('manuscript');
+  expect(decode('o=h&c=bronze').tr).toBe('manuscript');
+});
+
+test('an invalid tr falls back to the default', () => {
+  expect(decode('tr=carved').tr).toBe('manuscript');
 });
 
 test('encode omits values equal to the default to keep urls short', () => {

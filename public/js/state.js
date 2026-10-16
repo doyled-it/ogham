@@ -1,5 +1,5 @@
 export const DEFAULTS = {
-  t: '', o: 'v', w: 'gap', f: 'start', ng: true, h: 'keep', p: 'pin', c: 'carved', s: 5, wt: 'regular', bg: 'transparent',
+  t: '', o: 'v', w: 'gap', f: 'start', ng: true, h: 'keep', p: 'pin', c: 'carved', s: 5, wt: 'regular', bg: 'transparent', tr: 'manuscript',
 };
 
 const ENUMS = {
@@ -10,6 +10,7 @@ const ENUMS = {
   p: ['pin', 'ceirt', 'peith'],
   wt: ['thin', 'regular', 'heavy'],
   bg: ['transparent', 'white', 'canvas'],
+  tr: ['manuscript', 'monumental'],
 };
 
 export function encode(settings) {
