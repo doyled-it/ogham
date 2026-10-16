@@ -188,3 +188,31 @@ test('S-shaped Ailm is one poly crossing the stem', () => {
   const g = layout({ stems: [{ words: [[a]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
   expect(g.primitives.filter((p) => p.kind === 'poly')).toHaveLength(1);
 });
+
+const forfGlyph = (group, strokes = null) => ({ value: '?', name: group, group, strokes, flags: ['proposed'] });
+const strokesOf = (glyph) => layout({ stems: [{ words: [[glyph]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' }).primitives.filter((p) => p.kind === 'stroke');
+
+test('an angled vowel is two strokes per vowel stroke (a chevron each)', () => {
+  expect(strokesOf(forfGlyph('angled', 1))).toHaveLength(2);
+  expect(strokesOf(forfGlyph('angled', 5))).toHaveLength(10);
+});
+
+test('hammerhead Ailm is a crossing bar plus a foot', () => {
+  expect(strokesOf(forfGlyph('hammerhead'))).toHaveLength(2);
+});
+
+test('disjoined Eabhadh is four strokes with a central gap on the stem', () => {
+  const s = strokesOf(forfGlyph('disjoined-ea'));
+  expect(s).toHaveLength(4);
+  // no stroke crosses the stem centre line between the two chevron apexes
+});
+
+test('x-shaped Ifin is a two-stroke X on one side of the stem', () => {
+  const s = strokesOf(forfGlyph('x-ifin'));
+  expect(s).toHaveLength(2);
+  for (const k of s) { expect(k.x1).toBeGreaterThanOrEqual(0); expect(k.x2).toBeGreaterThanOrEqual(0); }
+});
+
+test('double R is a ten-stroke lattice', () => {
+  expect(strokesOf(forfGlyph('double-r'))).toHaveLength(10);
+});

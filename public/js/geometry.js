@@ -141,6 +141,49 @@ function semiUilleannStrokes(y) {
   return [['poly', sampleArc(0, y, 14, -Math.PI / 2, Math.PI / 2, 10)]];
 }
 
+// Angled vowels: one chevron per vowel stroke, apex on the stem pointing in the
+// reading direction, arms splaying to both sides. Two straight strokes per chevron.
+function angledVowelStrokes(n, y) {
+  const out = [];
+  for (let i = 0; i < n; i += 1) {
+    const yy = y - i * PITCH;
+    out.push([-12, yy + 5, 0, yy - 5]);
+    out.push([0, yy - 5, 12, yy + 5]);
+  }
+  return out;
+}
+// Hammerhead Ailm: a crossing bar with a short foot at one end, parallel to the stem.
+function hammerheadStrokes(y) {
+  return [
+    [-12, y, 12, y],
+    [12, y, 12, y - 10],
+  ];
+}
+// Disjoined Eabhadh: two chevrons facing across a central gap on the stem.
+function disjoinedEabhadhStrokes(y) {
+  return [
+    [-10, y + 12, 0, y + 2], [0, y + 2, 10, y + 12],
+    [-10, y - 12, 0, y - 2], [0, y - 2, 10, y - 12],
+  ];
+}
+// X-shaped Ifin: a plain X on one side of the stem, inner tips on the stem.
+function xIfinStrokes(y) {
+  return [
+    [0, y - 10, 20, y + 10],
+    [0, y + 10, 20, y - 10],
+  ];
+}
+// Double R: five Ruis diagonals overlaid by five mirrored diagonals.
+function doubleRStrokes(y) {
+  const out = [];
+  for (let i = 0; i < 5; i += 1) {
+    const yy = y - i * PITCH;
+    out.push([-15, yy - 11, 15, yy + 11]);
+    out.push([-15, yy + 11, 15, yy - 11]);
+  }
+  return out;
+}
+
 // Vertical extent a glyph occupies above its first stroke (first stroke to last).
 function glyphSpan(glyph) {
   if (glyph.group === 'p') return 20;      // Pín / Ifín: two X centres 20 apart
@@ -149,6 +192,11 @@ function glyphSpan(glyph) {
   if (glyph.group === 'rabbit-d') return 14;
   if (glyph.group === 's-ailm') return 0;
   if (glyph.group === 'semi-uilleann') return 0;
+  if (glyph.group === 'angled') return (glyph.strokes - 1) * PITCH;
+  if (glyph.group === 'hammerhead') return 0;
+  if (glyph.group === 'disjoined-ea') return 0;
+  if (glyph.group === 'x-ifin') return 0;
+  if (glyph.group === 'double-r') return 40;
   return (glyph.strokes - 1) * PITCH;
 }
 
@@ -159,6 +207,11 @@ function glyphStrokes(glyph, y, tradition) {
   if (glyph.group === 'rabbit-d') return rabbitDairStrokes(y);
   if (glyph.group === 's-ailm') return sAilmStrokes(y);
   if (glyph.group === 'semi-uilleann') return semiUilleannStrokes(y);
+  if (glyph.group === 'angled') return angledVowelStrokes(glyph.strokes, y);
+  if (glyph.group === 'hammerhead') return hammerheadStrokes(y);
+  if (glyph.group === 'disjoined-ea') return disjoinedEabhadhStrokes(y);
+  if (glyph.group === 'x-ifin') return xIfinStrokes(y);
+  if (glyph.group === 'double-r') return doubleRStrokes(y);
   return letterStrokes(glyph.group, glyph.strokes, y, PITCH, tradition);
 }
 
