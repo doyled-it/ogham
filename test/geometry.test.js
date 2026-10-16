@@ -45,6 +45,55 @@ test('Pín renders four strokes (a double X) and is one letter wide', () => {
   }
 });
 
+test('Éabhadh is a single X of two crossing strokes', () => {
+  const g = layout(tl('', {}), { ...OPTS, feather: 'none' });
+  // build a one-glyph result directly for a forfid by group
+  const forfid = { value: 'ea', name: 'Éabhadh', group: 'eabhadh', strokes: null, flags: [] };
+  const gg = layout({ stems: [{ words: [[forfid]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  const strokes = gg.primitives.filter((p) => p.kind === 'stroke');
+  expect(strokes).toHaveLength(2);
+  for (const s of strokes) {
+    expect(Math.abs(s.x1)).toBe(12);
+    expect(Math.abs(s.x2)).toBe(12);
+  }
+  // reference to g keeps the no-op empty layout honest
+  expect(g.primitives).toHaveLength(0);
+});
+
+test('Ór is a four-stroke diamond with its waist on the stem', () => {
+  const forfid = { value: 'oi', name: 'Ór', group: 'or', strokes: null, flags: [] };
+  const gg = layout({ stems: [{ words: [[forfid]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  const strokes = gg.primitives.filter((p) => p.kind === 'stroke');
+  expect(strokes).toHaveLength(4);
+  // left and right vertices sit off the stem, top and bottom vertices on it
+  const xs = strokes.flatMap((s) => [s.x1, s.x2]);
+  expect(Math.max(...xs)).toBe(13);
+  expect(Math.min(...xs)).toBe(-13);
+});
+
+test('Uilleann is a three-segment elbow', () => {
+  const forfid = { value: 'ui', name: 'Uilleann', group: 'uilleann', strokes: null, flags: [] };
+  const gg = layout({ stems: [{ words: [[forfid]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  expect(gg.primitives.filter((p) => p.kind === 'stroke')).toHaveLength(3);
+});
+
+test('Eamhancholl is a four-stroke crosshatch', () => {
+  const forfid = { value: 'ae', name: 'Eamhancholl', group: 'eamhancholl', strokes: null, flags: [] };
+  const gg = layout({ stems: [{ words: [[forfid]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  expect(gg.primitives.filter((p) => p.kind === 'stroke')).toHaveLength(4);
+});
+
+test('Peith is two short strokes, not the old Beith-and-hook', () => {
+  const forfid = { value: 'p', name: 'Peith', group: 'peith', strokes: null, flags: [] };
+  const gg = layout({ stems: [{ words: [[forfid]] }], ignored: [], notes: [] }, { ...OPTS, feather: 'none' });
+  const strokes = gg.primitives.filter((p) => p.kind === 'stroke');
+  expect(strokes).toHaveLength(2);
+  // both strokes run parallel to the stem (vertical), so x1 === x2 on each
+  for (const s of strokes) expect(s.x1).toBe(s.x2);
+  // and neither spans the full 30-unit Beith width
+  for (const s of strokes) expect(Math.abs(s.x2)).toBeLessThan(30);
+});
+
 test('per-word mode places stems 80 units apart', () => {
   const g = layout(tl('a a'), { ...OPTS, wordSep: 'per-word', feather: 'none' });
   const stems = g.primitives.filter((p) => p.kind === 'stem');

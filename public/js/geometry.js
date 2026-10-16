@@ -32,29 +32,82 @@ function pinStrokes(y) {
   return [...x(y), ...x(y - 20)];
 }
 
-// Peith: a Beith stroke (right) plus a small hook at its outer end.
+// Peith: two short strokes set parallel to the stem (the manuscript "soft
+// Beith"). Corrected from the earlier Beith-plus-hook form, which the Unicode
+// reference fonts do not support.
 function peithStrokes(y) {
   return [
-    [0, y, 30, y],
-    [30, y, 30, y - 6],
+    [6, y, 6, y - 14],
+    [12, y, 12, y - 14],
   ];
 }
 
+// Forfeda, drawn in the vertical convention (stem at x = 0), centred on y
+// unless noted. Shapes follow the Unicode reference charts and fonts; the three
+// flagged 'uncertain' in alphabet.js are the standard digital forms.
+
+// Éabhadh: a single X crossing the stem.
+function eabhadhStrokes(y) {
+  return [
+    [-12, y - 10, 12, y + 10],
+    [-12, y + 10, 12, y - 10],
+  ];
+}
+
+// Ór: a diamond, top and bottom vertices on the stem, sides off it.
+function orStrokes(y) {
+  return [
+    [0, y - 13, 13, y],
+    [13, y, 0, y + 13],
+    [0, y + 13, -13, y],
+    [-13, y, 0, y - 13],
+  ];
+}
+
+// Uilleann: a squared elbow hooking off the stem.
+function uilleannStrokes(y) {
+  return [
+    [0, y, 20, y],
+    [20, y, 20, y - 20],
+    [20, y - 20, 6, y - 20],
+  ];
+}
+
+// Eamhancholl: a crosshatch of two strokes each way ("twinned Coll").
+function eamhanchollStrokes(y) {
+  return [
+    [-10, y - 10, 10, y + 2],
+    [-10, y - 2, 10, y + 10],
+    [-10, y + 10, 10, y - 2],
+    [-10, y + 2, 10, y - 10],
+  ];
+}
+
+const FORFID_STROKES = {
+  eabhadh: eabhadhStrokes,
+  or: orStrokes,
+  uilleann: uilleannStrokes,
+  eamhancholl: eamhanchollStrokes,
+};
+const FORFID_SPAN = { eabhadh: 0, or: 0, uilleann: 20, eamhancholl: 0 };
+
 // Vertical extent a glyph occupies above its first stroke (first stroke to last).
 function glyphSpan(glyph) {
-  if (glyph.group === 'p') return 20; // double-X
-  if (glyph.group === 'peith') return 0;
+  if (glyph.group === 'p') return 20;      // Pín / Ifín: two X centres 20 apart
+  if (glyph.group === 'peith') return 14;  // two strokes 14 tall
+  if (glyph.group in FORFID_SPAN) return FORFID_SPAN[glyph.group];
   return (glyph.strokes - 1) * PITCH;
 }
 
-function glyphStrokes(glyph, y) {
+function glyphStrokes(glyph, y, tradition) {
   if (glyph.group === 'p') return pinStrokes(y);
   if (glyph.group === 'peith') return peithStrokes(y);
-  return letterStrokes(glyph.group, glyph.strokes, y);
+  if (FORFID_STROKES[glyph.group]) return FORFID_STROKES[glyph.group](y);
+  return letterStrokes(glyph.group, glyph.strokes, y, PITCH, tradition);
 }
 
 // Lay out one stem's glyphs (already grouped into words) at local x = 0.
-function layoutStemStrokes(words, weight, wordAdvance) {
+function layoutStemStrokes(words, weight, wordAdvance, tradition) {
   const width = STROKE_WIDTH[weight];
   const strokes = [];
   let cursorY = 0; // y of the next glyph's first stroke
@@ -62,7 +115,7 @@ function layoutStemStrokes(words, weight, wordAdvance) {
   let lastStrokeY = 0;
   words.forEach((glyphs, wi) => {
     glyphs.forEach((glyph, gi) => {
-      for (const s of glyphStrokes(glyph, cursorY)) strokes.push([...s, width]);
+      for (const s of glyphStrokes(glyph, cursorY, tradition)) strokes.push([...s, width]);
       lastStrokeY = cursorY - glyphSpan(glyph);
       const isLastGlyphOfWord = gi === glyphs.length - 1;
       const isLastWord = wi === words.length - 1;
@@ -78,7 +131,7 @@ function layoutStemStrokes(words, weight, wordAdvance) {
 function stemPrimitives(words, opts, offsetX) {
   const width = STROKE_WIDTH[opts.strokeWeight];
   const wordAdvance = opts.wordSep === 'gap' ? WORD_GAP : LETTER_GAP;
-  const { strokes, firstStrokeY, lastStrokeY } = layoutStemStrokes(words, opts.strokeWeight, wordAdvance);
+  const { strokes, firstStrokeY, lastStrokeY } = layoutStemStrokes(words, opts.strokeWeight, wordAdvance, opts.tradition);
   const prims = [];
   const footY = firstStrokeY + OVERSHOOT; // SVG-down, below the lowest stroke
   const topY = lastStrokeY - OVERSHOOT;
