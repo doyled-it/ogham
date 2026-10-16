@@ -40,3 +40,17 @@ export const LENITION_CONSONANTS = new Set(['b', 'c', 'd', 'f', 'g', 'm', 'p', '
 // breakdown shows strokesLabel instead.
 export const PIN = { value: 'p', name: 'Pín', group: 'p', strokes: null, variant: 'pin', strokesLabel: 'double X' };
 export const PEITH = { value: 'p', name: 'Peith', group: 'peith', strokes: null, variant: 'peith', strokesLabel: 'soft Beith' };
+
+// The six forfeda (supplementary letters), the single source for the geometry
+// dispatch and the in-page reference. `group` is the geometry key:
+// 'p' reuses the double-X Pín geometry (Ifín is that same sign), 'peith' the
+// corrected two-stroke Peith, the rest their own forms. `confidence` is
+// 'uncertain' for the three forms attested only in the reference fonts.
+export const FORFEDA = [
+  { id: 'eabhadh', name: 'Éabhadh', value: 'ea', codepoint: 'U+1695', group: 'eabhadh', strokesLabel: 'single X', confidence: 'high' },
+  { id: 'or', name: 'Ór', value: 'oi', codepoint: 'U+1696', group: 'or', strokesLabel: 'diamond', confidence: 'high' },
+  { id: 'uilleann', name: 'Uilleann', value: 'ui', codepoint: 'U+1697', group: 'uilleann', strokesLabel: 'elbow', confidence: 'uncertain' },
+  { id: 'ifin', name: 'Ifín', value: 'io', codepoint: 'U+1698', group: 'p', strokesLabel: 'double X', confidence: 'high' },
+  { id: 'eamhancholl', name: 'Eamhancholl', value: 'ae', codepoint: 'U+1699', group: 'eamhancholl', strokesLabel: 'crosshatch', confidence: 'uncertain' },
+  { id: 'peith', name: 'Peith', value: 'p', codepoint: 'U+169A', group: 'peith', strokesLabel: 'soft Beith', confidence: 'uncertain' },
+];
