@@ -6,7 +6,7 @@ test('decode of empty query gives the defaults', () => {
 });
 
 test('encode then decode round-trips a settings object', () => {
-  const s = { t: 'meitheal', o: 'h', w: 'per-word', f: 'both', ng: false, h: 'drop', p: 'ceirt', c: 'bronze', s: 8, wt: 'heavy', bg: 'white', tr: 'monumental' };
+  const s = { t: 'meitheal', o: 'h', w: 'per-word', f: 'both', ng: false, h: 'drop', p: 'ceirt', c: 'bronze', s: 8, wt: 'heavy', bg: 'white', tr: 'monumental', src: 'unicode' };
   expect(decode(encode(s))).toEqual(s);
 });
 
@@ -31,4 +31,10 @@ test('invalid values fall back to the default', () => {
   expect(s.o).toBe(DEFAULTS.o);
   expect(s.c).toBe('plaid'); // colourway id kept raw; getColourway maps unknown ids to carved downstream
   expect(s.s).toBe(DEFAULTS.s);
+});
+
+test('input source round-trips and defaults to latin', () => {
+  expect(decode('').src).toBe('latin');
+  expect(decode('src=unicode').src).toBe('unicode');
+  expect(decode('src=runes').src).toBe('latin');
 });
