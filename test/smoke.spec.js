@@ -23,7 +23,7 @@ test('switching to the monumental tradition shrinks the vowels to notches', asyn
   // four vowels in meitheal: e(4) i(5) e(4) a(1) = 14 vowel strokes, drawn as
   // full bars (x1 = -12) in the manuscript default.
   await expect(page.locator('#drawing svg line[x1="-12"]')).toHaveCount(14);
-  await page.check('#tr-monumental');
+  await page.click('label[for="tr-monumental"]');
   await expect(page.locator('#drawing svg line[x1="-12"]')).toHaveCount(0);
   await expect(page.locator('#drawing svg line[x1="-4"]')).toHaveCount(14);
 });

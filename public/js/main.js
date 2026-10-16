@@ -1,5 +1,6 @@
 import { transliterate } from './transliterate.js';
 import { layout } from './geometry.js';
+import { FORFEDA } from './alphabet.js';
 import { renderSVG } from './svg.js';
 import { COLOURWAYS, getColourway } from './colourways.js';
 import { DEFAULTS, encode, decode } from './state.js';
@@ -9,6 +10,7 @@ const els = {
   text: document.getElementById('text-input'),
   drawing: document.getElementById('drawing'),
   breakdown: document.getElementById('breakdown'),
+  forfeda: document.getElementById('forfeda'),
   readout: document.getElementById('readout'),
   warning: document.getElementById('warning'),
   lenition: document.getElementById('lenition-note'),
@@ -59,6 +61,7 @@ function readSettings() {
     c: radioVal('c', DEFAULTS.c),
     s: clampSize(parseFloat(els.size.value)),
     wt: radioVal('wt', DEFAULTS.wt),
+    tr: radioVal('tr', DEFAULTS.tr),
     bg: radioVal('bg', DEFAULTS.bg),
   };
 }
@@ -71,6 +74,7 @@ function applySettings(s) {
   els.hKeep.checked = s.h !== 'drop';
   setRadio('p', s.p);
   setRadio('wt', s.wt);
+  setRadio('tr', s.tr);
   setRadio('bg', s.bg);
   els.size.value = s.s;
   setRadio('c', s.c);
@@ -163,6 +167,38 @@ function renderBreakdown(glyphs) {
   els.breakdown.replaceChildren(frag);
 }
 
+/* Forfeda reference (static, drawn once from the FORFEDA table) */
+function renderForfeda() {
+  const frag = document.createDocumentFragment();
+  for (const f of FORFEDA) {
+    const tile = document.createElement('div');
+    tile.className = f.confidence === 'uncertain' ? 'tile unconfirmed' : 'tile';
+    if (f.confidence === 'uncertain') tile.title = 'Standard digital form, not yet confirmed against a manuscript';
+
+    const glyphBox = document.createElement('div');
+    glyphBox.className = 'tile-glyph';
+    glyphBox.setAttribute('aria-hidden', 'true');
+    const g = { value: f.value, name: f.name, group: f.group, strokes: null, strokesLabel: f.strokesLabel, flags: [] };
+    const mini = layout({ stems: [{ words: [[g]] }], ignored: [], notes: [] },
+      { orientation: 'vertical', wordSep: 'none', feather: 'none', strokeWeight: 'regular' });
+    glyphBox.innerHTML = renderSVG(mini, { colourway: { ink: 'currentColor', canvas: null }, spacingMm: 5 }).svg;
+
+    const value = document.createElement('div');
+    value.className = 'tile-value';
+    value.textContent = f.value;
+    const name = document.createElement('div');
+    name.className = 'tile-name';
+    name.textContent = f.name;
+    const cp = document.createElement('div');
+    cp.className = 'tile-cp';
+    cp.textContent = f.codepoint;
+
+    tile.append(glyphBox, value, name, cp);
+    frag.append(tile);
+  }
+  els.forfeda.replaceChildren(frag);
+}
+
 /* Main render */
 function render() {
   const raw = els.text.value;
@@ -179,7 +215,7 @@ function render() {
 
   els.drawing.dataset.colourway = s.c;
   const geom = layout(result, {
-    orientation: orientationOf(s.o), wordSep: s.w, feather: s.f, strokeWeight: s.wt,
+    orientation: orientationOf(s.o), wordSep: s.w, feather: s.f, strokeWeight: s.wt, tradition: s.tr,
   });
 
   if (!geom.primitives.length) {
@@ -272,7 +308,7 @@ function wire() {
   els.text.addEventListener('input', debounced);
   els.size.addEventListener('input', render);
 
-  for (const name of ['o', 'w', 'f', 'p', 'wt', 'bg']) {
+  for (const name of ['o', 'w', 'f', 'p', 'wt', 'bg', 'tr']) {
     document.querySelectorAll(`input[name="${name}"]`).forEach((el) => el.addEventListener('change', render));
   }
   els.ng.addEventListener('change', render);
@@ -294,6 +330,7 @@ function init() {
   initTheme();
   updateProvenance();
   wire();
+  renderForfeda();
   render();
 }
 
