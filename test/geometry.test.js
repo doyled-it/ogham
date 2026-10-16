@@ -94,6 +94,33 @@ test('Peith is two short strokes, not the old Beith-and-hook', () => {
   for (const s of strokes) expect(Math.abs(s.x2)).toBeLessThan(30);
 });
 
+test('manuscript vowels are full bars, monumental vowels are short notches', () => {
+  expect(letterStrokes('v', 1, 0)).toEqual([[-12, 0, 12, 0]]);
+  expect(letterStrokes('v', 1, 0, 10, 'manuscript')).toEqual([[-12, 0, 12, 0]]);
+  expect(letterStrokes('v', 1, 0, 10, 'monumental')).toEqual([[-4, 0, 4, 0]]);
+  expect(letterStrokes('v', 3, 0, 10, 'monumental')).toEqual([
+    [-4, 0, 4, 0], [-4, -10, 4, -10], [-4, -20, 4, -20],
+  ]);
+});
+
+test('tradition only changes vowels, not consonants or the m group', () => {
+  expect(letterStrokes('b', 1, 0, 10, 'monumental')).toEqual([[0, 0, 30, 0]]);
+  expect(letterStrokes('h', 1, 0, 10, 'monumental')).toEqual([[-30, 0, 0, 0]]);
+  expect(letterStrokes('m', 1, 0, 10, 'monumental')).toEqual([[-15, -11, 15, 11]]);
+});
+
+test('layout defaults to manuscript and monumental shrinks the vowel bars', () => {
+  const man = layout(tl('a'), { ...OPTS, feather: 'none' });
+  const mon = layout(tl('a'), { ...OPTS, feather: 'none', tradition: 'monumental' });
+  const vbar = man.primitives.find((p) => p.kind === 'stroke');
+  const vnotch = mon.primitives.find((p) => p.kind === 'stroke');
+  expect(vbar.x1).toBe(-12);
+  expect(vnotch.x1).toBe(-4);
+  // the default (no tradition given) matches manuscript
+  const def = layout(tl('a'), { ...OPTS, feather: 'none' });
+  expect(def.primitives.find((p) => p.kind === 'stroke').x1).toBe(-12);
+});
+
 test('per-word mode places stems 80 units apart', () => {
   const g = layout(tl('a a'), { ...OPTS, wordSep: 'per-word', feather: 'none' });
   const stems = g.primitives.filter((p) => p.kind === 'stem');

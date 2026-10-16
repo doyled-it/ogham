@@ -9,12 +9,13 @@ export const FEATHER_H = 12;
 export const STROKE_WIDTH = { thin: 3, regular: 4, heavy: 6 };
 
 // Strokes for one standard letter, first (lowest) stroke at y, stem at x = 0.
-// Returns [x1, y1, x2, y2] tuples in units. Mirrors the brief's reference.
-export function letterStrokes(group, n, y, pitch = PITCH) {
+// Returns [x1, y1, x2, y2] tuples in units. Vowels are full bars in the
+// manuscript tradition and short notches in the monumental (stone) tradition.
+export function letterStrokes(group, n, y, pitch = PITCH, tradition = 'manuscript') {
   const out = [];
   for (let i = 0; i < n; i += 1) {
     const yy = y - i * pitch;
-    if (group === 'v') out.push([-12, yy, 12, yy]);
+    if (group === 'v') out.push(tradition === 'monumental' ? [-4, yy, 4, yy] : [-12, yy, 12, yy]);
     else if (group === 'h') out.push([-30, yy, 0, yy]);
     else if (group === 'b') out.push([0, yy, 30, yy]);
     else if (group === 'm') out.push([-15, yy - 11, 15, yy + 11]);
@@ -181,7 +182,7 @@ function buildVertical(result, opts) {
 }
 
 export function layout(result, opts) {
-  const o = { orientation: 'vertical', wordSep: 'gap', feather: 'start', strokeWeight: 'regular', ...opts };
+  const o = { orientation: 'vertical', wordSep: 'gap', feather: 'start', strokeWeight: 'regular', tradition: 'manuscript', ...opts };
   let primitives = buildVertical(result, o);
   if (o.orientation === 'horizontal') primitives = rotateCW(primitives);
   return { primitives, bounds: computeBounds(primitives) };
