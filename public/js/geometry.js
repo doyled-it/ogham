@@ -111,12 +111,16 @@ function glyphStrokes(glyph, y, tradition) {
 function layoutStemStrokes(words, weight, wordAdvance, tradition) {
   const width = STROKE_WIDTH[weight];
   const strokes = [];
+  const polys = [];
   let cursorY = 0; // y of the next glyph's first stroke
   const firstStrokeY = 0;
   let lastStrokeY = 0;
   words.forEach((glyphs, wi) => {
     glyphs.forEach((glyph, gi) => {
-      for (const s of glyphStrokes(glyph, cursorY, tradition)) strokes.push([...s, width]);
+      for (const part of glyphStrokes(glyph, cursorY, tradition)) {
+        if (part[0] === 'poly') polys.push({ points: part[1], width });
+        else strokes.push([...part, width]);
+      }
       lastStrokeY = cursorY - glyphSpan(glyph);
       const isLastGlyphOfWord = gi === glyphs.length - 1;
       const isLastWord = wi === words.length - 1;
@@ -126,19 +130,22 @@ function layoutStemStrokes(words, weight, wordAdvance, tradition) {
       }
     });
   });
-  return { strokes, firstStrokeY, lastStrokeY };
+  return { strokes, polys, firstStrokeY, lastStrokeY };
 }
 
 function stemPrimitives(words, opts, offsetX) {
   const width = STROKE_WIDTH[opts.strokeWeight];
   const wordAdvance = opts.wordSep === 'gap' ? WORD_GAP : LETTER_GAP;
-  const { strokes, firstStrokeY, lastStrokeY } = layoutStemStrokes(words, opts.strokeWeight, wordAdvance, opts.tradition);
+  const { strokes, polys, firstStrokeY, lastStrokeY } = layoutStemStrokes(words, opts.strokeWeight, wordAdvance, opts.tradition);
   const prims = [];
   const footY = firstStrokeY + OVERSHOOT; // SVG-down, below the lowest stroke
   const topY = lastStrokeY - OVERSHOOT;
   prims.push({ kind: 'stem', x1: offsetX, y1: footY, x2: offsetX, y2: topY, width });
   for (const [x1, y1, x2, y2, w] of strokes) {
     prims.push({ kind: 'stroke', x1: x1 + offsetX, y1, x2: x2 + offsetX, y2, width: w });
+  }
+  for (const p of polys) {
+    prims.push({ kind: 'poly', points: p.points.map(([x, y]) => [x + offsetX, y]), width: p.width });
   }
   if (opts.feather === 'start' || opts.feather === 'both') {
     const apexY = firstStrokeY + FEATHER_BELOW; // below the first stroke

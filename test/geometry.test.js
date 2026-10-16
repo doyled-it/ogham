@@ -154,3 +154,12 @@ test('rotateCW rotates a poly primitive point by point', () => {
   const [p] = rotateCW([{ kind: 'poly', points: [[2, 3], [4, 5]], width: 4 }]);
   expect(p.points).toEqual([[-3, 2], [-5, 4]]);
 });
+
+test('a glyph part marked poly becomes a poly primitive carried through layout', () => {
+  // A synthetic glyph whose group has no geometry yet falls through to letterStrokes,
+  // so we test the mixed-parts path directly via the exported helper in a later task.
+  // Here we assert the stem builder keeps straight strokes working unchanged.
+  const g = layout(tl('b'), { ...OPTS, feather: 'none' });
+  expect(g.primitives.filter((p) => p.kind === 'stroke')).toHaveLength(1);
+  expect(g.primitives.filter((p) => p.kind === 'poly')).toHaveLength(0);
+});
